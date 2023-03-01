@@ -1,3 +1,4 @@
 christina
 =========
-![p](https://user-images.githubusercontent.com/69394316/222245957-139e8e55-a670-411c-966d-fa1d84370c13.png)
+
+![p(1)](https://user-images.githubusercontent.com/69394316/222246410-d9b5d726-a701-4b43-b899-4ba39a50b811.png)
