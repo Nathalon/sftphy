@@ -4,6 +4,6 @@ sftphy
 
 [![Open Source Love](https://badges.frapsoft.com/os/v2/open-source-175x29.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-![p(1)](https://user-images.githubusercontent.com/69394316/222246410-d9b5d726-a701-4b43-b899-4ba39a50b811.png)
+![Screenshot_2023-03-05_15-26-33](https://user-images.githubusercontent.com/69394316/222963545-a9b1f139-1cd4-4c50-9c7d-03f0f3fc8896.png)
 
 ![Ruby](https://img.shields.io/badge/Ruby-CC342D?style=for-the-badge&logo=ruby&logoColor=white/)
