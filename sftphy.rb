@@ -331,5 +331,5 @@ end
   end
 end
 
-sftp = Sftphy.ne
+sftp = Sftphy.new
 sftp.run(ARGV)
