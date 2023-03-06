@@ -170,152 +170,53 @@ class Sftphy
   end
 
   def mkdir(sftp)
-    begin 
-      sftp.mkdir!(@options.mkdir)
-      output("[i] Creating Directory => #{@options.mkdir}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.mkdir!(@options.mkdir)
+    output("[i] Creating Directory => #{@options.mkdir}")
   end
 
   def rmdir(sftp)
-    begin
-      sftp.rmdir!(@options.rmdir)     
-      output("[i] Removing Directory => #{@options.rmdir}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.rmdir!(@options.rmdir)     
+    output("[i] Removing Directory => #{@options.rmdir}")
   end
 
   def remove(sftp)
-    begin
-      sftp.remove!(@options.erase)
-      output("[i] Removing File => #{@options.erase}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.remove!(@options.erase)
+    output("[i] Removing File => #{@options.erase}")
   end
 
   def query(sftp)
-    begin
-      output("[i] Checking Permissions => #{sftp.stat!(@options.query).permissions}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    output("[i] Checking Permissions => #{sftp.stat!(@options.query).permissions}")
   end
 
   def grab(sftp)
-    begin
-      sftp.download!(@options.grab)
-      output("[i] Grabing File => #{@options.grab}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.download!(@options.grab)
+    output("[i] Grabing File => #{@options.grab}")
   end
 
   def rename(sftp)
-    begin
-      sftp.rename!(@options.name, @options.new)
-      output("[i] Renaming File => #{@options.name}")
-      output("[i] New File => #{@options.new}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.rename!(@options.name, @options.new)
+    output("[i] Renaming File => #{@options.name}")
+    output("[i] New File => #{@options.new}")
   end
 
   def change(sftp)
-    begin
-      sftp.setstat!(@options.change, :permissions => @options.authorization)
-      output("[i] Setting Permissions To => #{@options.change}")
-      output("[i] Permissions Set To => #{@options.authorization}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.setstat!(@options.change, :permissions => @options.authorization)
+    output("[i] Setting Permissions To => #{@options.change}")
+    output("[i] Permissions Set To => #{@options.authorization}")
   end
 
   def upload(sftp) 
-    begin  
-      sftp.upload!(@options.transfer, @options.destination)
-      output("[i] Uploading File To => #{@options.set_host}")
-      output("\t-- Local File => #{@options.transfer}")
-      output("\t-- File Destination => #{@options.destination}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.upload!(@options.transfer, @options.destination)
+    output("[i] Uploading File To => #{@options.set_host}")
+    output("\t-- Local File => #{@options.transfer}")
+    output("\t-- File Destination => #{@options.destination}")
   end
 
   def download(sftp)
-    begin
-      sftp.download!(@options.file, @options.output)
-      output("[i] Downloading File From => #{@options.set_host}")
-      output("\t-- Remote File => #{@options.file}")
-      output("\t-- File Destination => #{@options.output}")
-
-    rescue Net::SFTP::StatusException => error
-      output("[!] => #{error.message}")
-
-    ensure
-      output("----------------------------------------------------------")
-      output("[*] Exiting")
-      output("----------------------------------------------------------")
-      exit
-    end
+    sftp.download!(@options.file, @options.output)
+    output("[i] Downloading File From => #{@options.set_host}")
+    output("\t-- Remote File => #{@options.file}")
+    output("\t-- File Destination => #{@options.output}")
   end
 
   def list(sftp)
