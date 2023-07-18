@@ -12,7 +12,7 @@
 **ruby: `$ sudo apt install ruby -y`**  
 **net-sftp: `$ sudo gem install net-sftp`**  
 
-**The Commands are pretty straight forward.**  
+**The commands are pretty straight forward.**  
 **Let's go through them one by one.**  
 
 **`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -t COPYING -d /tmp/COPYING`**  
