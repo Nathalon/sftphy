@@ -14,251 +14,211 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require 'net/sftp'
-require 'ostruct'
 require 'optparse'
+require 'net/sftp'
 
-class Sftphy
-  AUTHOR = "Author => (SLcK)"
-  SCRIPT = "Script => (sftphy.rb)"
-  VERSION = "Version => (1.0.0)"
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby t.rb [options]"
 
-  def run(arguments)
-    parse(arguments)
-    connect
+  opts.on("-u", "--upload FILE", "Upload FILE via SFTP") do |file|
+    options[:upload_file] = file
   end
 
-  private
+  opts.on("-d", "--download REMOTE_PATH", "Download file from REMOTE_PATH via SFTP") do |remote_path|
+    options[:download_remote_path] = remote_path
+  end
 
-  def parse(arguments)
-    ARGV << "-h" if ARGV.empty?
-    @options = OpenStruct.new
+  opts.on("-m", "--mkdir DIRECTORY_PATH", "Create directory on the SFTP server") do |directory_path|
+    options[:create_directory] = directory_path
+  end
 
-    OptionParser.new do |opts|
-      opts.banner = "Usage: #{__FILE__} [options]"
+  opts.on("--rmdir DIRECTORY_PATH", "Remove directory from the SFTP server") do |directory_path|
+    options[:remove_directory] = directory_path
+  end
 
-      opts.on("-s", "--set-host=HOST", String, 
-      	      "The Host To Connect To") do |set_host|
-        @options.set_host = set_host
-      end
+  opts.on("--rmfile FILE_PATH", "Remove file from the SFTP server") do |file_path|
+    options[:remove_file] = file_path
+  end
 
-      opts.on("-u", "--username=USERNAME", String, 
-              "Authenticate With A Username") do |username|
-        @options.username = username
-      end
+  opts.on("-q", "--queryperm REMOTE_PATH", "Query permissions of a file/directory on the SFTP server") do |remote_path|
+    options[:query_permissions] = remote_path
+  end
 
-      opts.on("-p", "--password=PASSWORD", String, 
-              "Authenticate With A Password") do |password|
-        @options.password = password
-      end
+  opts.on("-c", "--chmod PERMISSIONS", "Change permissions of a file/directory on the SFTP server") do |permissions|
+    options[:change_permissions] = permissions
+  end
 
-      opts.on("-w", "--wharf=WHARF", Integer, 
-              "Specify The Wharf (Port) The Service Is Running") do |wharf|
-        @options.wharf = wharf
-      end
+  opts.on("-l", "--list REMOTE_PATH", "List files and directories at REMOTE_PATH on the SFTP server") do |remote_path|
+    options[:list_remote_path] = remote_path
+  end
 
-      opts.on("-t", "--transfer=FILE", String, 
-              "Upload An Entire File On Disk") do |transfer|
-        @options.transfer = transfer
-      end
+  opts.on("-h", "--host HOST", "SFTP host") do |host|
+    options[:host] = host
+  end
 
-      opts.on("-d", "--destination=FILE", String, 
-              "Destination For The Uploaded File") do |destination|
-        @options.destination = destination
-      end
+  opts.on("-U", "--username USERNAME", "SFTP username") do |username|
+    options[:username] = username
+  end
 
-      opts.on("-m", "--mkdir=CREATE DIRECTORY", String, 
-              "Create A Directory") do |mkdir|
-        @options.mkdir = mkdir
-      end
+  opts.on("-p", "--password PASSWORD", "SFTP password") do |password|
+    options[:password] = password
+  end
 
-      opts.on("-r", "--rmdir=REMOVE DIRECTORY", String, 
-              "Remove A Directory") do |rmdir|
-        @options.rmdir = rmdir
-      end
+  opts.on("-r", "--remote REMOTE_PATH", "Remote path on the SFTP server") do |remote_path|
+    options[:remote_path] = remote_path
+  end
+end.parse!
 
-      opts.on("-q", "--query=FILE", String, 
-              "Query A File’s Permissions") do |query|
-        @options.query = query
-      end
-
-      opts.on("-e", "--erase=FILE", String, 
-              "Delete A File") do |erase|
-        @options.erase = erase
-      end
-
-      opts.on("-c", "--change=FILE", String, 
-              "Change A File’s Permissions") do |change|
-        @options.change = change
-      end
-
-      opts.on("-a", "--authorization=INTEGER", Integer, 
-              "Combine With The Above Command To Change A File's Permissions") do |authorization|
-        @options.authorization = authorization
-      end
-
-      opts.on("-b", "--brand=FILE", String, 
-              "Brand (Rename) A File") do |name|
-        @options.name = name
-      end
-
-      opts.on("-n", "--new=FILE", String, 
-              "The Name Of The Renamed File") do |new|
-        @options.new = new
-      end
-
-      opts.on("-l", "--list=DIRECTORY", String, 
-              "Query The Contents Of A Directory") do |list|
-        @options.list = list
-      end
-
-      opts.on("-f", "--file=FILE", String, 
-              "Download Directly To A Local File") do |file|
-        @options.file = file
-      end
-
-      opts.on("-o", "--output=FILE", String,
-              "Destination Of The Downloaded File") do |output|
-        @options.output = output
-      end
-
-      opts.on("-h", "--help", 
-              "Show Help And Exit") do
-        puts opts
-        exit
-      end
-
-      opts.on("-V", "--version", 
-              "Show Version And Exit") do
-              
-        puts AUTHOR
-        puts SCRIPT
-        puts VERSION
-        exit
-      end
-
-      begin
-        opts.parse!(arguments)
-      rescue OptionParser::MissingArgument, OptionParser::InvalidOption => error
-        handle_error(error)
-      end
+def upload_file_to_sftp(host, username, password, remote_path, local_path)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.upload!(local_path, remote_path)
     end
-  end
-
-  def connect
-    output("----------------------------------------------------------")
-    output("[*] Starting at => #{Time.now}")
-    output("[*] Operating System => #{RUBY_PLATFORM}")
-    output("----------------------------------------------------------")
-
-    output("[i] Connecting to Secure SHell")
-    output("\t-- Host => #{@options.set_host}")
-    output("\t-- Username => #{@options.username}")
-    output("\t-- Password => #{@options.password}")
-    output("\t-- Wharf => #{@options.wharf}")
-    output("----------------------------------------------------------")
-
-    begin
-      Net::SFTP.start(@options.set_host, @options.username, password: @options.password, port: @options.wharf) do |sftp|
-        mkdir(sftp) if @options.mkdir
-        rmdir(sftp) if @options.rmdir
-        remove(sftp) if @options.erase
-        query(sftp) if @options.query
-        list(sftp) if @options.list
-        rename(sftp) if @options.name || @options.new
-        change(sftp) if @options.change || @options.authorization
-        upload(sftp) if @options.transfer || @options.destination
-        download(sftp) if @options.file || @options.output
-      end
-    rescue Net::SFTP::StatusException => error
-      handle_error(error)
-    end
-
-    output("----------------------------------------------------------")
-    output("[*] Exiting at => #{Time.now}")
-    output("----------------------------------------------------------")
-  end
-
-  def mkdir(sftp)
-    sftp.mkdir!(@options.mkdir)
-    output("[i] Creating Directory => #{@options.mkdir}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def rmdir(sftp)
-    sftp.rmdir!(@options.rmdir)
-    output("[i] Removing Directory => #{@options.rmdir}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def remove(sftp)
-    sftp.remove!(@options.erase)
-    output("[i] Removing File => #{@options.erase}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def query(sftp)
-    output("[i] Checking Permissions => #{sftp.stat!(@options.query).permissions}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def rename(sftp)
-    sftp.rename!(@options.name, @options.new)
-    output("[i] Renaming File => #{@options.name}")
-    output("[i] New File => #{@options.new}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def change(sftp)
-    sftp.setstat!(@options.change, permissions: @options.authorization)
-    output("[i] Setting Permissions To => #{@options.change}")
-    output("[i] Permissions Set To => #{@options.authorization}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def upload(sftp)
-    sftp.upload!(@options.transfer, @options.destination)
-    output("[i] Uploading File To => #{@options.set_host}")
-    output("\t-- Local File => #{@options.transfer}")
-    output("\t-- File Destination => #{@options.destination}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def download(sftp)
-    sftp.download!(@options.file, @options.output)
-    output("[i] Downloading File From => #{@options.set_host}")
-    output("\t-- Remote File => #{@options.file}")
-    output("\t-- File Destination => #{@options.output}")
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def list(sftp)
-    output("[i] Listing Contents Of => #{@options.list}")
-    output("----------------------------------------------------------")
-    sftp.dir.foreach(@options.list) do |entry|
-      output(entry.longname)
-    end
-  rescue Net::SFTP::StatusException => error
-    handle_error(error)
-  end
-
-  def handle_error(error)
-    puts "[!] => #{error.message}"
-    exit
-  end
-
-  def output(string)
-    puts string
+    puts "File uploaded successfully!"
+  rescue StandardError => e
+    puts "Error uploading file: #{e.message}"
   end
 end
 
-sftp = Sftphy.new
-sftp.run(ARGV)
+def download_file_from_sftp(host, username, password, remote_path, local_path)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.download!(remote_path, local_path)
+    end
+    puts "File downloaded successfully!"
+  rescue StandardError => e
+    puts "Error downloading file: #{e.message}"
+  end
+end
+
+def create_directory_on_sftp(host, username, password, remote_path)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.mkdir!(remote_path)
+    end
+    puts "Directory created successfully!"
+  rescue StandardError => e
+    puts "Error creating directory: #{e.message}"
+  end
+end
+
+def remove_directory_on_sftp(host, username, password, remote_path)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.rmdir!(remote_path)
+    end
+    puts "Directory removed successfully!"
+  rescue StandardError => e
+    puts "Error removing directory: #{e.message}"
+  end
+end
+
+def remove_file_on_sftp(host, username, password, remote_path)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.remove!(remote_path)
+    end
+    puts "File removed successfully!"
+  rescue StandardError => e
+    puts "Error removing file: #{e.message}"
+  end
+end
+
+def query_permissions_on_sftp(host, username, password, remote_path)
+  begin
+    permissions = nil
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      attributes = sftp.stat!(remote_path)
+      permissions = attributes.permissions.to_s(8)[-3, 3]
+    end
+    puts "Permissions for #{remote_path}: #{permissions}"
+  rescue StandardError => e
+    puts "Error querying permissions: #{e.message}"
+  end
+end
+
+def change_permissions_on_sftp(host, username, password, remote_path, permissions)
+  begin
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.setstat(remote_path, permissions: permissions.to_i(8))
+    end
+    puts "Permissions for #{remote_path} changed to: #{permissions}"
+  rescue StandardError => e
+    puts "Error changing permissions: #{e.message}"
+  end
+end
+
+def list_files_and_directories_on_sftp(host, username, password, remote_path)
+  begin
+    files = []
+    directories = []
+    Net::SFTP.start(host, username, password: password) do |sftp|
+      sftp.dir.foreach(remote_path) do |entry|
+        if entry.file?
+          files << entry.name
+        elsif entry.directory?
+          directories << entry.name
+        end
+      end
+    end
+    puts "Files at #{remote_path}:"
+    puts files.join("\n")
+    puts "\nDirectories at #{remote_path}:"
+    puts directories.join("\n")
+  rescue StandardError => e
+    puts "Error listing files and directories: #{e.message}"
+  end
+end
+
+if options[:upload_file]
+  if options[:host] && options[:username] && options[:password] && options[:remote_path]
+    upload_file_to_sftp(options[:host], options[:username], options[:password], options[:remote_path], options[:upload_file])
+  else
+    puts "Please provide all the required options for uploading."
+  end
+elsif options[:download_remote_path]
+  if options[:host] && options[:username] && options[:password] && options[:remote_path]
+    download_file_from_sftp(options[:host], options[:username], options[:password], options[:download_remote_path], options[:download_remote_path].split('/').last)
+  else
+    puts "Please provide all the required options for downloading."
+  end
+elsif options[:create_directory]
+  if options[:host] && options[:username] && options[:password] && options[:create_directory]
+    create_directory_on_sftp(options[:host], options[:username], options[:password], options[:create_directory])
+  else
+    puts "Please provide all the required options for creating a directory."
+  end
+elsif options[:remove_directory]
+  if options[:host] && options[:username] && options[:password] && options[:remove_directory]
+    remove_directory_on_sftp(options[:host], options[:username], options[:password], options[:remove_directory])
+  else
+    puts "Please provide all the required options for removing a directory."
+  end
+elsif options[:remove_file]
+  if options[:host] && options[:username] && options[:password] && options[:remove_file]
+    remove_file_on_sftp(options[:host], options[:username], options[:password], options[:remove_file])
+  else
+    puts "Please provide all the required options for removing a file."
+  end
+elsif options[:query_permissions]
+  if options[:host] && options[:username] && options[:password] && options[:query_permissions]
+    query_permissions_on_sftp(options[:host], options[:username], options[:password], options[:query_permissions])
+  else
+    puts "Please provide all the required options for querying permissions."
+  end
+elsif options[:change_permissions]
+  if options[:host] && options[:username] && options[:password] && options[:remote_path] && options[:change_permissions]
+    change_permissions_on_sftp(options[:host], options[:username], options[:password], options[:remote_path], options[:change_permissions])
+  else
+    puts "Please provide all the required options for changing permissions."
+  end
+elsif options[:list_remote_path]
+  if options[:host] && options[:username] && options[:password] && options[:list_remote_path]
+    list_files_and_directories_on_sftp(options[:host], options[:username], options[:password], options[:list_remote_path])
+  else
+    puts "Please provide all the required options for listing files and directories."
+  end
+else
+  puts "Usage: ruby t.rb [--help]"
+end
