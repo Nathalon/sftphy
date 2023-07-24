@@ -15,14 +15,13 @@
 **The commands are pretty straight forward.**  
 **Let's go through them one by one.**  
 
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -t COPYING -d /tmp/COPYING`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -m directory /tmp/make`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -r directory /tmp/remove`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -q /tmp/query`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -e /tmp/erase`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -c /tmp/permissions -a 0644`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -b /tmp/named -n /tmp/renamed`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -l /tmp/listdirectory/`**  
-**`$ ./sftphy.rb -s 192.168.1.109 -u username -p password -w 22 -f /tmp/download -o download`**  
+**`$ ruby sftphy.rb -u /local/path/to/file -r /remote/path -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb -d /remote/path/to/file -r /local/path -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --mkdir /remote/path/to/directory -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --rmdir /remote/path/to/directory -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --rmfile /remote/path/to/file -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --queryperm /remote/path/to/file_or_directory -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --chmod PERMISSIONS -r /remote/path/to/file_or_directory -h HOST -U USERNAME -p PASSWORD`**  
+**`$ ruby sftphy.rb --list /remote/path -h HOST -U USERNAME -p PASSWORD`**  
 
 ![Ruby](https://img.shields.io/badge/Ruby-CC342D?style=for-the-badge&logo=ruby&logoColor=white/)
