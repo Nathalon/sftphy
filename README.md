@@ -24,4 +24,6 @@
 **`$ ruby sftphy.rb --chmod PERMISSIONS -r /remote/path/to/file_or_directory -h HOST -U USERNAME -p PASSWORD`**  
 **`$ ruby sftphy.rb --list /remote/path -h HOST -U USERNAME -p PASSWORD`**  
 
-![Ruby](https://img.shields.io/badge/Ruby-CC342D?style=for-the-badge&logo=ruby&logoColor=white/)
+  <a href="https://www.ruby-lang.org/en/" target="_blank" rel="noreferrer">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/ruby/ruby-original.svg" alt="ruby"
+      width="50" height="50" /> 
