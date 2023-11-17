@@ -220,5 +220,5 @@ elsif options[:list_remote_path]
     puts "Please provide all the required options for listing files and directories."
   end
 else
-  puts "Usage: ruby t.rb [--help]"
+  puts "Usage: ruby sftphy.rb [--help]"
 end
